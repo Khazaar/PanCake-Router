@@ -53,7 +53,7 @@ library PancakeLibrary {
     ) internal view returns (uint256 reserveA, uint256 reserveB) {
         (address token0, ) = sortTokens(tokenA, tokenB);
         pairFor(factory, tokenA, tokenB);
-        console.log("Hint46");
+        //console.log("Hint46");
         console.log(factory);
         console.log(tokenA);
         console.log(tokenB);

@@ -6,4 +6,4 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ERC20Basic.sol";
 
-contract ERC20Apple is ERC20Basic("Apple", "APL"), Ownable {}
+contract ERC20RottenCarrot is ERC20Basic("RottenCarrot", "RTC"), Ownable {}

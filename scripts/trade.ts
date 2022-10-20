@@ -17,7 +17,7 @@ async function main() {
     const address0 = ethers.constants.AddressZero;
     const contractApple = await new ERC20Apple__factory(owner).attach(appleContractAddress);
     const contractPotato = await new ERC20Potato__factory(owner).attach(potatoContractAddress);
-    const pancakeERC20 = await new PancakeERC20__factory(owner).attach(pancakeERC20ContractAddress);
+    //const pancakeERC20 = await new PancakeERC20__factory(owner).attach(pancakeERC20ContractAddress);
     const pancakeFactory = await new PancakeFactory__factory(owner).attach(factoryContractAddress);
     const router = await new PancakeRouter__factory(owner).attach(routerContractAddress);
 

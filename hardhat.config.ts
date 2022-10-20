@@ -1,24 +1,11 @@
 import { HardhatUserConfig } from "hardhat/config";
-import { task } from "hardhat/config";
-import { subtask } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-import * as tdly from "@tenderly/hardhat-tenderly";
-import { run } from "hardhat";
 
-tdly.setup();
-tdly.setup({
-  automaticVerifications: false
-});
-
-// task("t", "Runs temporary script", async () => {
-//   //run("hh run scripts/temp.ts");
-//   await run("help");
-// });
-
-
+//import 'hardhat-deploy';
 
 const config: HardhatUserConfig = {
   defaultNetwork: "localhost",
+  //defaultNetwork: "hardhat",
 
   networks: {
     hardhat: {
@@ -37,7 +24,6 @@ const config: HardhatUserConfig = {
       { version: "0.8.0", },
       { version: "0.8.4", },
       { version: "0.4.18", },
-
     ]
   },
 };

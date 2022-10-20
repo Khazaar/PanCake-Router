@@ -4,7 +4,7 @@ import "./interfaces/IPancakeERC20.sol";
 import "./libraries/SafeMath.sol";
 import "hardhat/console.sol";
 
-contract PancakeERC20 is IPancakeERC20 {
+contract ERC20Pancake is IPancakeERC20 {
     using SafeMath for uint;
 
     string public constant name = "Pancake LPs";

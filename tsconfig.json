@@ -13,6 +13,8 @@
     "./typechain-types",
     "./node_modules",
     "./contracts",
-    "./contracts/libraries"
+    "./contracts/libraries",
+    "./deploy",
+    "hardhat.config.ts"
   ],
 }

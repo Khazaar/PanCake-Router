@@ -1,44 +1,24 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-import { expect } from "chai";
 import { ethers } from "hardhat";
-import { tenderly } from "hardhat";
-import { PancakeERC20__factory, PancakeFactory, PancakeFactory__factory, PancakePair__factory, PancakePair, PancakeRouter, ERC20Apple__factory, ERC20Potato__factory, PancakeRouter__factory } from "../typechain-types"
+import { ERC20LSR__factory, PancakeERC20__factory, PancakeFactory, PancakeFactory__factory, PancakePair__factory, PancakePair, PancakeRouter, ERC20Apple__factory, ERC20Potato__factory, PancakeRouter_mod__factory } from "../typechain-types"
+import { ContractAddress } from "./local-chain-data"
+import { deployPankaceFixture } from "./deploy-fixture";
+import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 
 async function main() {
-    const appleContractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-    const potatoContractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-    const pancakeERC20ContractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-    const factoryContractAddress = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
-    const routerContractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
-
-    const [owner, user1, user2, user3] = await ethers.getSigners();
-    const users = [owner, user1, user2, user3]
-    const address0 = ethers.constants.AddressZero;
-    const contractApple = await new ERC20Apple__factory(owner).attach(appleContractAddress);
-    const contractPotato = await new ERC20Potato__factory(owner).attach(potatoContractAddress);
-    const pancakeERC20 = await new PancakeERC20__factory(owner).attach(pancakeERC20ContractAddress);
-    const pancakeFactory = await new PancakeFactory__factory(owner).attach(factoryContractAddress);
-    const router = await new PancakeRouter__factory(owner).attach(routerContractAddress);
+    const { owner, user1, user2, user3, user4, contractApple, contractPotato, pancakeFactory, router, contractPancakeERC20,
+        contractLSRERC20, router_mod, appleAmount, lsrAmount, potatoAmount } = await loadFixture(deployPankaceFixture);
 
 
-    const hash1 = await pancakeFactory.INIT_CODE_PAIR_HASH();
-    //console.log(`Hash is ${hash1}`);
-
-    const appleAmount = BigInt(1000000);
-    const potatoAmount = BigInt(2000000);
-    await contractApple.connect(user3).getTokens(appleAmount.toString());
-    await contractPotato.connect(user3).getTokens(potatoAmount.toString());
-    await contractApple.connect(user3).approve(router.address, appleAmount.toString());
-    await contractPotato.connect(user3).approve(router.address, potatoAmount.toString());
-
-    // Add liquidity
-    const tx = await router.connect(user3).addLiquidity(contractApple.address, contractPotato.address, appleAmount, potatoAmount, appleAmount, potatoAmount, user3.address, 216604939048);
-
+    //Add liquidity
+    const tx = await router_mod.connect(user3).addLiquidity(
+        contractApple.address, contractPotato.address,
+        appleAmount, potatoAmount,
+        appleAmount, potatoAmount,
+        user3.address, 216604939048);
 
     const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);
     const pair: PancakePair = await new PancakePair__factory(owner).attach(pairAddress);
-
 };
 
 // We recommend this pattern to be able to use async/await everywhere
@@ -47,3 +27,15 @@ main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
 });
+
+
+// function addLiquidity(
+//     address tokenA,
+//     address tokenB,
+//     uint amountADesired,
+//     uint amountBDesired,
+//     uint amountAMin,
+//     uint amountBMin,
+//     address to,
+//     uint deadline
+//   ) 
