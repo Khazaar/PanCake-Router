@@ -38,7 +38,8 @@ library PancakeLibrary {
                         keccak256(abi.encodePacked(token0, token1)),
                         //hex"a5934690703a592a07e841ca29d5e5c79b5e22ed4749057bb216dc31100be1c0" // init code hash
                         //hex"e2855dd3fc07f33b23ea10cc71107ad2912643a5d0e66da772f435915bf08b3c"
-                        hex"cd1d23da9bd3ff589894b9335edbe60eda254017a2aae258486d69e8595820a6"
+                        //hex"cd1d23da9bd3ff589894b9335edbe60eda254017a2aae258486d69e8595820a6"
+                        hex"295e3a9806e1c742fa923111c7ad15a89cbd839dd5f32fbae63647a4a57726c2"
                     )
                 )
             )

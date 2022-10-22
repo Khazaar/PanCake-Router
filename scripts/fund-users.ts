@@ -3,18 +3,31 @@ import { address } from "hardhat/internal/core/config/config-validation";
 import { ERC20Apple__factory, ERC20Potato__factory, ERC20LSR__factory } from "../typechain-types"
 import { ContractAddress } from "./local-chain-data"
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
+import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
 
 async function main() {
   // Connetc to DEX
   const [owner, user1, user2, user3, user4] = await ethers.getSigners();
   const address0 = ethers.constants.AddressZero;
+  //await deployments.fixture();
   // const contractApple = await new ERC20Apple__factory(owner).attach(ContractAddress.ERC20Apple);
   // const contractPotato = await new ERC20Potato__factory(owner).attach(ContractAddress.ERC20Potato);
   // const contractLSR = await new ERC20LSR__factory(owner).attach(ContractAddress.ERC20LSR);
-  const contractApple = await ethers.getContract("ERC20Apple");
-  const contractPotato = await ethers.getContract("ERC20Potato");
-  const contractLSR = await ethers.getContract("ERC20LSR");
+  // await deployments.fixture(["ERC20LSR"]);
+  // await deployments.fixture(["ERC20Potato"]);
+  // await deployments.fixture(["ERC20Apple"]);
+
+
+
+  const contractApple = await ethers.getContract('ERC20Apple');
+  const contractPotato = await ethers.getContract('ERC20Potato');
+  const contractLSR = await ethers.getContract('ERC20LSR');
+
+
+  // const contractApple = await deployments.get('ERC20Apple');
+  // const contractPotato = await deployments.get('ERC20Potato');
+  // const contractLSR = await deployments.get('ERC20LSR');
 
   const appleAmount = BigInt(1000000);
   const lsrAmount = BigInt(1000000);

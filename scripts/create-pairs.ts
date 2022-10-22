@@ -1,19 +1,17 @@
 import { ethers } from "hardhat";
 import { address } from "hardhat/internal/core/config/config-validation";
 //import { ERC20Apple__factory, ERC20Potato__factory } from "../typechain-types/"
-import { PancakeERC20__factory, PancakeFactory__factory, ERC20Apple__factory, ERC20Potato__factory, PancakeRouter__factory, ERC20RottenCarrot__factory, ERC20LSR__factory, PancakeRouter_mod__factory } from "../typechain-types"
+import { ERC20Pancake__factory, PancakeFactory__factory, ERC20Apple__factory, ERC20Potato__factory, PancakeRouter__factory, ERC20RottenCarrot__factory, ERC20LSR__factory, PancakeRouter_mod__factory } from "../typechain-types"
 import { ContractAddress } from "./local-chain-data"
 
 async function main() {
   // Connetc to DEX
-  const [owner, user1, user2, user3, user4] = await ethers.getSigners();
-  const users = [owner, user1, user2, user3, user4];
-  const contractApple = await new ERC20Apple__factory(owner).attach(ContractAddress.ERC20Apple);
-  const contractPotato = await new ERC20Potato__factory(owner).attach(ContractAddress.ERC20Potato);
-  const contractLSR = await new ERC20LSR__factory(owner).attach(ContractAddress.ERC20LSR);
-  const pancakeERC20 = await new PancakeERC20__factory(owner).attach(ContractAddress.PancakePair);
-  const pancakeFactory = await new PancakeFactory__factory(owner).attach(ContractAddress.PancakeFactory);
-  const router_mod = await new PancakeRouter_mod__factory(owner).attach(ContractAddress.PancakeRouter_mod);
+  const contractApple = await ethers.getContract("ERC20Apple");
+  const contractPotato = await ethers.getContract("ERC20Potato");
+  const contractLSR = await ethers.getContract("ERC20LSR");
+  const contractPancake = await ethers.getContract("ERC20Pancake");
+  const pancakeFactory = await ethers.getContract("PancakeFactory");
+
 
   // Create Potato-Apple pair
   let tx1 = await pancakeFactory.createPair(contractPotato.address, contractApple.address);

@@ -34,6 +34,8 @@ async function main() {
     const tx = await router_mod.connect(user3).addLiquidity(contractApple.address, contractPotato.address, appleAmount,
         appleAmount, potatoAmount, potatoAmount, user3.address, 216604939048);
 
+
+
     const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);
     const pair: PancakePair = await new PancakePair__factory(owner).attach(pairAddress);
 };

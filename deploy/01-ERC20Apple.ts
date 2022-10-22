@@ -4,18 +4,22 @@ import { PancakeRouter_mod__factory, ERC20LSR__factory, PancakeFactory__factory,
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-const ERC20LSR: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
+
+const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre;
-    const { deploy, get } = deployments;
+    const { deploy } = deployments;
+
     const { deployer } = await getNamedAccounts();
-    await deploy("ERC20LSR", {
+
+    await deploy('ERC20Apple', {
         from: deployer,
+        args: [],
         log: true,
     });
 };
+export default func;
+func.tags = ['ERC20Apple'];
 
-export default ERC20LSR;
-//func.tags = ['Token'];
 
 // async function main() {
 //     const [owner, user1, user2, user3] = await ethers.getSigners();
