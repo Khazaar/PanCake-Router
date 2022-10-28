@@ -16,8 +16,7 @@ task("prepare", "Deploy, fund, add liq").setAction(
     await run("run", { script: "scripts/fund-users.ts" });
     await run("run", { script: "scripts/add-liquidity.ts" });
     await run("run", { script: "scripts/swap.ts" });
-
-    //await run("run", { script: "scripts/add-liquidity.ts" });
+    await run("run", { script: "scripts/dex-status.ts" });
 
   }
 );

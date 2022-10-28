@@ -10,6 +10,7 @@ import "./libraries/SafeMath.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IWETH.sol";
 import "hardhat/console.sol";
+import "./ERC20LSR.sol";
 
 contract PancakeRouter_mod is IPancakeRouter02 {
     using SafeMath for uint256;
