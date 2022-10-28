@@ -3,10 +3,24 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy-tenderly";
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
+import { task } from "hardhat/config";
+import '@nomiclabs/hardhat-ethers';
+
 //import "@tenderly/hardhat-tenderly";
 // tdly.setup({
 //   automaticVerifications: false
 // });
+
+task("prepare", "Deploy, fund, add liq").setAction(
+  async (_args, { ethers, run }) => {
+    await run("run", { script: "scripts/fund-users.ts" });
+    await run("run", { script: "scripts/add-liquidity.ts" });
+    await run("run", { script: "scripts/swap.ts" });
+
+    //await run("run", { script: "scripts/add-liquidity.ts" });
+
+  }
+);
 
 const config: HardhatUserConfig = {
   //defaultNetwork: "localhost",

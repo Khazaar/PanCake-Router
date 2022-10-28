@@ -32,7 +32,7 @@ interface IPancakeRouter02 is IPancakeRouter01 {
         address[] calldata path,
         address to,
         uint256 deadline
-    ) external;
+    ) external payable;
 
     function swapExactETHForTokensSupportingFeeOnTransferTokens(
         uint256 amountOutMin,

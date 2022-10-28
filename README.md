@@ -1,4 +1,6 @@
 ## With hardhat-deploy plugin
+## TASKS ##
+hh prepare --network localhost
 
 0. Run node and deploy
 hh node
@@ -7,9 +9,11 @@ hh run scripts/fund-users.ts --network localhost
 2. Check DEX status
 hh run scripts/dex-status.ts --network localhost
 3. Create pairs
-`hh run scripts/create-pairs.ts --network localhost`
+hh run scripts/create-pairs.ts --network localhost
 4. Add Liquidity
-`hh run scripts/add-liquidity.ts --network localhost`
+hh run scripts/add-liquidity.ts --network localhost
+5. Swap
+hh run scripts/swap.ts --network localhost
 
 
 ## Project instructions

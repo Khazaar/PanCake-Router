@@ -378,11 +378,23 @@ contract PancakeRouter_mod is IPancakeRouter02 {
         uint256 deadline
     )
         external
+        payable
         virtual
         override
         ensure(deadline)
         returns (uint256[] memory amounts)
     {
+        amounts = PancakeLibrary.getAmountsOut(factory, amountIn, path);
+        console.log("dbgstrt");
+        console.log(amounts.length);
+        console.log(amounts[amounts.length - 1]);
+        console.log(amountOutMin);
+        console.log("dbgend");
+
+        require(
+            amounts[amounts.length - 1] >= amountOutMin,
+            "PancakeRouter: INSUFFICIENT_OUTPUT_AMOUNT"
+        );
         amounts = PancakeLibrary.getAmountsOut(factory, amountIn, path);
         require(
             amounts[amounts.length - 1] >= amountOutMin,
@@ -394,6 +406,9 @@ contract PancakeRouter_mod is IPancakeRouter02 {
             PancakeLibrary.pairFor(factory, path[0], path[1]),
             amounts[0]
         );
+        // (bool sent, bytes memory data) = address(this).call{value: 1 ether}("");
+        // require(sent, "Failed to send Ether");
+
         _swap(amounts, path, to);
     }
 
@@ -590,7 +605,7 @@ contract PancakeRouter_mod is IPancakeRouter02 {
         address[] calldata path,
         address to,
         uint256 deadline
-    ) external virtual override ensure(deadline) {
+    ) external payable virtual override ensure(deadline) {
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,

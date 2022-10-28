@@ -16,6 +16,9 @@
     "./contracts",
     "./contracts/libraries",
     "./deploy",
-    "hardhat.config.ts"
+    "./tasks",
   ],
+  "files": [
+    "./hardhat.config.ts"
+  ]
 }

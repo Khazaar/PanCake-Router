@@ -2,6 +2,7 @@ pragma solidity =0.5.16;
 
 import "./interfaces/IPancakeFactory.sol";
 import "./PancakePair.sol";
+import "hardhat/console.sol";
 
 contract PancakeFactory is IPancakeFactory {
     bytes32 public constant INIT_CODE_PAIR_HASH =
@@ -22,6 +23,8 @@ contract PancakeFactory is IPancakeFactory {
 
     constructor(address _feeToSetter) public {
         feeToSetter = _feeToSetter;
+        console.log("Hash:");
+        console.log(string(abi.encodePacked(INIT_CODE_PAIR_HASH)));
     }
 
     function allPairsLength() external view returns (uint) {

@@ -44,7 +44,6 @@ contract ERC20Pancake is IPancakeERC20 {
     function _mint(address to, uint value) internal {
         totalSupply = totalSupply.add(value);
         balanceOf[to] = balanceOf[to].add(value);
-        console.log("MINTED!!!");
         console.log(value);
 
         emit Transfer(address(0), to, value);

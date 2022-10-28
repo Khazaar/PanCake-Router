@@ -378,6 +378,7 @@ contract PancakeRouter is IPancakeRouter02 {
         uint256 deadline
     )
         external
+        payable
         virtual
         override
         ensure(deadline)
@@ -590,7 +591,7 @@ contract PancakeRouter is IPancakeRouter02 {
         address[] calldata path,
         address to,
         uint256 deadline
-    ) external virtual override ensure(deadline) {
+    ) external payable override ensure(deadline) {
         TransferHelper.safeTransferFrom(
             path[0],
             msg.sender,

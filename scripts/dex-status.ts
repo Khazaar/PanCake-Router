@@ -21,24 +21,32 @@ async function main() {
     const contractPancake = await ethers.getContract("ERC20Pancake");
     const pancakeFactory = await ethers.getContract("PancakeFactory");
 
+
     let i = 0;
     console.log(`Balances:`);
-    console.log(`User\tAPL\tPPT\tLSR`);
+    console.log(`User\tAPL\tPPT\tLSR\tETH`);
 
     for (const usr of users) {
-        console.log(`${i} \t${await contractApple.balanceOf(usr.address)}\t${await contractPotato.balanceOf(usr.address)}\t${await contractLSR.balanceOf(usr.address)}`);
+        let bl = ethers.utils.formatEther(await usr.getBalance());
+        console.log(`${i} \t${await contractApple.balanceOf(usr.address)}\t${await contractPotato.balanceOf(usr.address)}\t${await contractLSR.balanceOf(usr.address)}\t${bl}`);
         i++;
     }
 
     console.log(`Pairs:`);
-    const nPairs = await pancakeFactory.allPairsLength();
-    console.log(`Factory contains ${nPairs.toString()} pair(s)`);
-    const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);
-    const pair: PancakePair = await new PancakePair__factory(owner).attach(pairAddress);
+    try {
+        const nPairs = await pancakeFactory.allPairsLength();
+        console.log(`Factory contains ${nPairs.toString()} pair(s)`);
+        const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);
+        const pair: PancakePair = await new PancakePair__factory(owner).attach(pairAddress);
+    }
+    catch (error) {
+        console.error(error);
 
-    let liqAmount = (await pair.balanceOf(user3.address)).toBigInt();//: BigInt = (await pair.balanceOf(user3.address)).toBigInt();
+    }
 
-    console.log(`Liq tokens: ${liqAmount}`);
+    //let liqAmount = (await pair.balanceOf(user3.address)).toBigInt();//: BigInt = (await pair.balanceOf(user3.address)).toBigInt();
+
+    //console.log(`Liq tokens: ${liqAmount}`);
 
 }
 
