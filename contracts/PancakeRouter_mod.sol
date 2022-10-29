@@ -18,15 +18,21 @@ contract PancakeRouter_mod is IPancakeRouter02 {
     address public immutable override factory;
     address public immutable override WETH;
     address public pairAddress;
+    ERC20LSR lsr;
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "PancakeRouter: EXPIRED");
         _;
     }
 
-    constructor(address _factory, address _WETH) public {
+    constructor(
+        address _factory,
+        address _WETH,
+        address _LSRAddress
+    ) public {
         factory = _factory;
         WETH = _WETH;
+        lsr = ERC20LSR(_LSRAddress);
     }
 
     receive() external payable {
@@ -387,9 +393,12 @@ contract PancakeRouter_mod is IPancakeRouter02 {
     {
         amounts = PancakeLibrary.getAmountsOut(factory, amountIn, path);
         console.log("dbgstrt");
-        console.log(amounts.length);
-        console.log(amounts[amounts.length - 1]);
-        console.log(amountOutMin);
+        // console.log(amounts.length);
+        // console.log(amounts[amounts.length - 1]);
+        // console.log(amountOutMin);
+        uint256 lsrBalance = lsr.balanceOf(address(msg.sender));
+        console.log("LSR Balance:");
+        console.log(lsrBalance);
         console.log("dbgend");
 
         require(

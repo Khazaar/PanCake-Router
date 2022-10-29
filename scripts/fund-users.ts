@@ -51,7 +51,7 @@ async function main() {
   await contractPotato.connect(user4).getTokens(potatoAmount.toString());
 
   //Fund with LSR
-  await contractLSR.connect(user4).getTokens(lsrAmount.toString());
+  await contractLSR.connect(user3).getTokens(lsrAmount.toString());
   console.log(`Funded successfully`);
 
 

@@ -56,9 +56,9 @@ library PancakeLibrary {
         (address token0, ) = sortTokens(tokenA, tokenB);
         pairFor(factory, tokenA, tokenB);
         //console.log("Hint46");
-        console.log(factory);
-        console.log(tokenA);
-        console.log(tokenB);
+        // console.log(factory);
+        // console.log(tokenA);
+        // console.log(tokenB);
 
         (uint256 reserve0, uint256 reserve1, ) = IPancakePair(
             pairFor(factory, tokenA, tokenB)
@@ -67,9 +67,9 @@ library PancakeLibrary {
             ? (reserve0, reserve1)
             : (reserve1, reserve0);
 
-        console.log("Reserves:");
-        console.log(reserveA);
-        console.log(reserveB);
+        // console.log("Reserves:");
+        // console.log(reserveA);
+        // console.log(reserveB);
     }
 
     // given some amount of an asset and pair reserves, returns an equivalent amount of the other asset

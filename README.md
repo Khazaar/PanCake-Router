@@ -14,6 +14,8 @@ hh run scripts/create-pairs.ts --network localhost
 hh run scripts/add-liquidity.ts --network localhost
 5. Swap
 hh run scripts/swap.ts --network localhost
+6. Call oracle
+hh run scripts/oracle.ts --network localhost
 
 
 ## Project instructions
