@@ -1,4 +1,4 @@
-import { ERC20Pancake__factory, PancakeFactory__factory, PancakePair__factory, PancakePair, ERC20Apple__factory, ERC20Potato__factory, ERC20LSR__factory } from "../typechain-types"
+import { PancakeRouter_mod, ERC20Pancake__factory, PancakeFactory__factory, PancakePair__factory, PancakePair, ERC20Apple__factory, ERC20Potato__factory, ERC20LSR__factory } from "../typechain-types"
 import { ContractAddress } from "./local-chain-data"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
@@ -7,8 +7,8 @@ import 'hardhat-deploy-ethers';
 
 async function main() {
 
-    const [owner, user1, user2, user3, user4] = await ethers.getSigners();
-    const users = [owner, user1, user2, user3, user4];
+    const [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
+    const users = [owner, user1, user2, user3, user4, user5];
     //await deployments.fixture();
     // const contractApple = await new ERC20Apple__factory(owner).attach(ContractAddress.ERC20Apple);
     // const contractPotato = await new ERC20Potato__factory(owner).attach(ContractAddress.ERC20Potato);
@@ -20,7 +20,7 @@ async function main() {
     const contractLSR = await ethers.getContract("ERC20LSR");
     const contractPancake = await ethers.getContract("ERC20Pancake");
     const pancakeFactory = await ethers.getContract("PancakeFactory");
-
+    const router_mod: PancakeRouter_mod = await ethers.getContract("PancakeRouter_mod");
 
     let i = 0;
     console.log(`Balances:`);
@@ -31,6 +31,9 @@ async function main() {
         console.log(`${i} \t${await contractApple.balanceOf(usr.address)}\t${await contractPotato.balanceOf(usr.address)}\t${await contractLSR.balanceOf(usr.address)}\t${bl}`);
         i++;
     }
+
+    console.log(`router \t${await contractApple.balanceOf(router_mod.address)}\t${await contractPotato.balanceOf(router_mod.address)}\t${await contractLSR.balanceOf(router_mod.address)}`);
+
 
     console.log(`Pairs:`);
     try {

@@ -25,7 +25,7 @@ async function main() {
     try {
         await exampleOracleSimple.update();
         const amnt = await exampleOracleSimple.consult(contractApple.address, 1000);
-        console.log(amnt.toString());
+        console.log(`For 1000 apples you will get ${amnt.toString()} potatos`);
     }
     catch (err) {
         console.log(err);

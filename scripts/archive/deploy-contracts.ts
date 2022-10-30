@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 import { address } from "hardhat/internal/core/config/config-validation";
-import { PancakeRouter_mod__factory, ERC20LSR__factory, PancakeFactory__factory, PancakePair__factory, ERC20Apple__factory, ERC20Potato__factory, PancakeRouter__factory, ERC20RottenCarrot__factory } from "../typechain-types"
+import { PancakeRouter_mod__factory, ERC20LSR__factory, PancakeFactory__factory, PancakePair__factory, ERC20Apple__factory, ERC20Potato__factory, PancakeRouter__factory, ERC20RottenCarrot__factory } from "../typechain-types";
 
 async function main() {
   const [owner, user1, user2, user3] = await ethers.getSigners();

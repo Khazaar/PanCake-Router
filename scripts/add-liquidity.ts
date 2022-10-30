@@ -28,17 +28,18 @@ async function main() {
     //Approve transfer
     let tx = await contractApple.connect(user3).approve(router_mod.address, appleAmount.toString());
     let receipt = await tx.wait(1);
-    console.log(`Allowance is ${await contractApple.connect(user3).allowance(user3.address, router_mod.address)}`);
+    //console.log(`Allowance is ${await contractApple.connect(user3).allowance(user3.address, router_mod.address)}`);
     //console.log(receipt);
     tx = await contractPotato.connect(user3).approve(router_mod.address, potatoAmount.toString());
     receipt = await tx.wait(1);
-    console.log(`Allowance is ${await contractPotato.connect(user3).allowance(user3.address, router_mod.address)}`);
+    //console.log(`Allowance is ${await contractPotato.connect(user3).allowance(user3.address, router_mod.address)}`);
 
     //Add liquidity
+
     tx = await router_mod.connect(user3).addLiquidity(
         contractApple.address, contractPotato.address,
         appleAmount, potatoAmount,
-        appleAmount, potatoAmount,
+        appleAmount * BigInt(1), potatoAmount,
         user3.address, 216604939048);
 
     const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);

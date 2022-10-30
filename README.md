@@ -16,6 +16,8 @@ hh run scripts/add-liquidity.ts --network localhost
 hh run scripts/swap.ts --network localhost
 6. Call oracle
 hh run scripts/oracle.ts --network localhost
+7. Withdraw fees
+hh run scripts/withdrawFees.ts --network localhost
 
 
 ## Project instructions

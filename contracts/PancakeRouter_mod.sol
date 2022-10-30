@@ -1,23 +1,30 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity =0.6.6;
 
-import "@uniswap/lib/contracts/libraries/TransferHelper.sol";
-
 import "./interfaces/IPancakeRouter02.sol";
 import "./interfaces/IPancakeFactory.sol";
 import "./libraries/PancakeLibrary.sol";
 import "./libraries/SafeMath.sol";
+import "./libraries/TransferHelper.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IWETH.sol";
 import "hardhat/console.sol";
 import "./ERC20LSR.sol";
+import "./access/Roles.sol";
+import "./access/Ownable.sol";
 
-contract PancakeRouter_mod is IPancakeRouter02 {
+contract PancakeRouter_mod is IPancakeRouter02, Ownable {
     using SafeMath for uint256;
+    using Roles for Roles.Role;
+
+    Roles.Role private _admins;
 
     address public immutable override factory;
     address public immutable override WETH;
     address public pairAddress;
+    address private adminAddress;
+    uint256 private swapFee = 10; // divide by 10000
+    uint256 private lsrMinBalance = 100; //minimum LSR balance to avoid swapFee
     ERC20LSR lsr;
 
     modifier ensure(uint256 deadline) {
@@ -37,6 +44,28 @@ contract PancakeRouter_mod is IPancakeRouter02 {
 
     receive() external payable {
         assert(msg.sender == WETH); // only accept ETH via fallback from the WETH contract
+    }
+
+    function setAdminAddress(address _adminAddress) public onlyOwner {
+        adminAddress = _adminAddress;
+        _admins.add(_adminAddress);
+        console.log("Admin set to %s", adminAddress);
+    }
+
+    function withdrawFees(address _token) public {
+        require(_admins.has(msg.sender), "DOES_NOT_HAVE_ADMIN_ROLE");
+        uint256 totalBalance = IERC20(_token).balanceOf(address(this));
+        IERC20(_token).transfer(owner(), totalBalance);
+    }
+
+    function setSwapFee(uint256 _swapFee) public {
+        require(_admins.has(msg.sender), "DOES_NOT_HAVE_ADMIN_ROLE");
+        swapFee = _swapFee;
+    }
+
+    function setLsrMinBalance(uint256 _lsrMinBalance) public {
+        require(_admins.has(msg.sender), "DOES_NOT_HAVE_ADMIN_ROLE");
+        lsrMinBalance = _lsrMinBalance;
     }
 
     function setPairAddress(address _pair) public {
@@ -392,14 +421,29 @@ contract PancakeRouter_mod is IPancakeRouter02 {
         returns (uint256[] memory amounts)
     {
         amounts = PancakeLibrary.getAmountsOut(factory, amountIn, path);
-        console.log("dbgstrt");
-        // console.log(amounts.length);
-        // console.log(amounts[amounts.length - 1]);
-        // console.log(amountOutMin);
+
         uint256 lsrBalance = lsr.balanceOf(address(msg.sender));
+        uint256 fee;
+        console.log("dbgstrt");
         console.log("LSR Balance:");
         console.log(lsrBalance);
+        if (lsrBalance >= lsrMinBalance) {
+            fee = 0;
+        } else {
+            fee = (amountIn * swapFee) / 10000;
+        }
+
+        console.log("Fee is");
+        console.log(fee);
+
         console.log("dbgend");
+        TransferHelper.safeTransferFrom(
+            path[0],
+            msg.sender,
+            address(this),
+            fee
+        );
+        amountIn = amountIn - fee;
 
         require(
             amounts[amounts.length - 1] >= amountOutMin,
