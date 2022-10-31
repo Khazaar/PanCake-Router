@@ -19,6 +19,7 @@ hh run scripts/oracle.ts --network localhost
 7. Withdraw fees
 hh run scripts/withdrawFees.ts --network localhost
 
+hh deploy --network testnet
 
 ## Project instructions
 

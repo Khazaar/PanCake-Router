@@ -6,6 +6,8 @@ typechain
 typechain-types
 deployments
 
+secrets.json
+
 #Hardhat files
 cache
 artifacts

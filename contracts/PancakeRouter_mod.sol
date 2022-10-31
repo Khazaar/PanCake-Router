@@ -3,11 +3,13 @@ pragma solidity =0.6.6;
 
 import "./interfaces/IPancakeRouter02.sol";
 import "./interfaces/IPancakeFactory.sol";
+import "./interfaces/IERC20.sol";
+import "./interfaces/IWETH.sol";
+
 import "./libraries/PancakeLibrary.sol";
 import "./libraries/SafeMath.sol";
 import "./libraries/TransferHelper.sol";
-import "./interfaces/IERC20.sol";
-import "./interfaces/IWETH.sol";
+
 import "hardhat/console.sol";
 import "./ERC20LSR.sol";
 import "./access/Roles.sol";
