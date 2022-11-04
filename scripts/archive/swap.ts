@@ -15,11 +15,32 @@ async function main() {
     const pancakeFactory: PancakeFactory = await ethers.getContract("PancakeFactory");
     const router_mod: PancakeRouter_mod = await ethers.getContract("PancakeRouter_mod");
 
+    //const hash1 = await pancakeFactory.INIT_CODE_PAIR_HASH();
     try {
-        // Set user5 as admin
-        //await router_mod.connect(owner).setAdminAddress(user5.address);
-        await router_mod.connect(user5).withdrawFees(contractApple.address);
+        const pairAddress = await pancakeFactory.getPair(contractApple.address, contractLSR.address);
+        const pair: PancakePair = new PancakePair__factory(owner).attach(pairAddress);
 
+        const [reserve0, reserve1, time] = await pair.getReserves();
+        console.log(`Reserves are: ${reserve0.toString()}, ${reserve1.toString()}`);
+
+        const appleAmount = BigInt(20000);
+        const potatoAmount = BigInt(20000);
+        const lsrAmount = BigInt(2000);
+
+        const expectedAmnt = await router_mod.getAmountOut(appleAmount, reserve0, reserve1);
+        console.log(`Expecting to get ${expectedAmnt} tokens`);
+
+        await router_mod.connect(user3).swapExactTokensForTokens(appleAmount, 1,
+            [contractLSR.address, contractPotato.address], user3.address,
+            99999999999999);
+
+        // LSR -> APL OK!
+        // APL -> LSR No!
+
+
+        // await router_mod.connect(user4).swapExactTokensForTokens(appleAmount, 10,
+        //     [contractApple.address, contractPotato.address], user4.address,
+        //     99999999999999);
     }
     catch (err) {
         console.log(err);

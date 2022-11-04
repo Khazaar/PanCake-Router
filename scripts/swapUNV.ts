@@ -14,41 +14,40 @@ async function main() {
     const contractPancake: ERC20Pancake = await ethers.getContract("ERC20Pancake");
     const pancakeFactory: PancakeFactory = await ethers.getContract("PancakeFactory");
     const router_mod: PancakeRouter_mod = await ethers.getContract("PancakeRouter_mod");
-    //await router_mod.connect(owner).setAdminAddress(user5.address);
-
-
 
     //const hash1 = await pancakeFactory.INIT_CODE_PAIR_HASH();
     try {
-        const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);
+        // SETUP
+        const usr = user2;
+        const tokenA = "ERC20Apple";
+        const tokenB = "ERC20LSR";
+        const swapAAmount = BigInt(10000).toString();
+        const contractA = await ethers.getContract(tokenA);
+        const contractB = await ethers.getContract(tokenB);
+
+        const pairAddress = await pancakeFactory.getPair(contractB.address, contractA.address);
         const pair: PancakePair = new PancakePair__factory(owner).attach(pairAddress);
+        console.log(`Pair address: ${pairAddress.toString()}`);
 
-        const [reserve0, reserve1, time] = await pair.getReserves();
-        console.log(`Reserves are: ${reserve0.toString()}, ${reserve1.toString()}`);
-        //console.log(`Cumulative prices is: ${await pair.price0CumulativeLast()}`);
+        let [reserve0, reserve1, time] = await pair.getReserves();
+        console.log(`Reserves before swap are: ${reserve0.toString()}, ${reserve1.toString()}`);
 
-        const appleAmount = BigInt(20000);
-        const potatoAmount = BigInt(2000);
-
-        await contractApple.connect(user4).approve(router_mod.address, appleAmount.toString());
-        await contractPotato.connect(user4).approve(router_mod.address, potatoAmount.toString());
-        await contractApple.connect(user2).approve(router_mod.address, appleAmount.toString());
-        await contractPotato.connect(user2).approve(router_mod.address, potatoAmount.toString());
-
-        const expectedAmnt = await router_mod.getAmountOut(appleAmount, reserve0, reserve1);
+        const expectedAmnt = await router_mod.getAmountOut(swapAAmount, reserve0, reserve1);
         console.log(`Expecting to get ${expectedAmnt} tokens`);
 
-        router_mod.connect(user5).setSwapFee(10); // set Fee * 10000
-        router_mod.connect(user5).setLsrMinBalance(100000000); // to avoid fees
-
-
-        await router_mod.connect(user2).swapExactTokensForTokens(appleAmount, 10,
-            [contractApple.address, contractPotato.address], user2.address,
+        await router_mod.connect(usr).swapExactTokensForTokens(swapAAmount, 1,
+            [contractA.address, contractB.address], usr.address,
             99999999999999);
 
-        await router_mod.connect(user4).swapExactTokensForTokens(appleAmount, 10,
-            [contractApple.address, contractPotato.address], user4.address,
-            99999999999999);
+        let filter = await pair.filters.Swap();
+        let logs = await pair.queryFilter(filter);
+        console.log(`Sender  ${logs[logs.length - 1].args.sender}, amount0In ${logs[logs.length - 1].args.amount0In}, 
+        amount1In ${logs[logs.length - 1].args.amount1In}, amount0Out ${logs[logs.length - 1].args.amount0Out}, 
+        amount1Out ${logs[logs.length - 1].args.amount1Out}, to ${logs[logs.length - 1].args.to}`);
+
+        [reserve0, reserve1, time] = await pair.getReserves();
+        console.log(`Reserves after swap are: ${reserve0.toString()}, ${reserve1.toString()}`);
+
     }
     catch (err) {
         console.log(err);

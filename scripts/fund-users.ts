@@ -1,7 +1,6 @@
 import { address } from "hardhat/internal/core/config/config-validation";
 //import { ERC20Apple__factory, ERC20Potato__factory } from "../typechain-types/"
-import { ERC20Apple__factory, ERC20Potato__factory, ERC20LSR__factory } from "../typechain-types"
-import { ContractAddress } from "./local-chain-data"
+import { PancakeRouter_mod, ERC20Apple__factory, ERC20Potato__factory, ERC20LSR__factory } from "../typechain-types"
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
@@ -9,25 +8,13 @@ import 'hardhat-deploy-ethers';
 async function main() {
   // Connetc to DEX
   const [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
-  const address0 = ethers.constants.AddressZero;
-  //await deployments.fixture();
-  // const contractApple = await new ERC20Apple__factory(owner).attach(ContractAddress.ERC20Apple);
-  // const contractPotato = await new ERC20Potato__factory(owner).attach(ContractAddress.ERC20Potato);
-  // const contractLSR = await new ERC20LSR__factory(owner).attach(ContractAddress.ERC20LSR);
-  // await deployments.fixture(["ERC20LSR"]);
-  // await deployments.fixture(["ERC20Potato"]);
-  // await deployments.fixture(["ERC20Apple"]);
-
-
+  const users = [owner, user1, user2, user3, user4, user5];
 
   const contractApple = await ethers.getContract('ERC20Apple');
   const contractPotato = await ethers.getContract('ERC20Potato');
   const contractLSR = await ethers.getContract('ERC20LSR');
+  const router_mod: PancakeRouter_mod = await ethers.getContract("PancakeRouter_mod");
 
-
-  // const contractApple = await deployments.get('ERC20Apple');
-  // const contractPotato = await deployments.get('ERC20Potato');
-  // const contractLSR = await deployments.get('ERC20LSR');
 
   const appleAmount = BigInt(1000000);
   const lsrAmount = BigInt(1000000);
@@ -46,24 +33,15 @@ async function main() {
 
   //Fund with LSR
   await contractLSR.connect(user4).getTokens(lsrAmount.toString());
+  await contractLSR.connect(user3).getTokens(lsrAmount.toString());
   console.log(`Funded successfully`);
 
 
-
-  //Approve token to router
-  // await contractApple.connect(user3).approve(router.address, appleAmount.toString());
-  // await contractPotato.connect(user3).approve(router.address, potatoAmount.toString());
-
-  // Get liquidity
-  // const [_reserve0, _reserve1, _blockTimestampLast] = await pair.getReserves();
-  // console.log(`Reserve 1 ${_reserve0}, Reserve 2 ${_reserve1}`);
-
-
-  // Add liquidity (1 apple = 2 potatos)
-  // await router.connect(user3).addLiquidity(contractApple.address, contractPotato.address, 20, 20, 2, 2, user3.address, 21660493904, { gasLimit: 1000000000 });
-  // console.log("Liquidity added successfully");
-
-
+  for (const usr of users) {
+    await contractApple.connect(usr).approve(router_mod.address, 9999999999999);
+    await contractPotato.connect(usr).approve(router_mod.address, 9999999999999);
+    await contractLSR.connect(usr).approve(router_mod.address, 9999999999999);
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -1,6 +1,4 @@
 import { PancakeRouter_mod, ERC20Pancake__factory, PancakeFactory__factory, PancakePair__factory, PancakePair, ERC20Apple__factory, ERC20Potato__factory, ERC20LSR__factory } from "../typechain-types"
-import { ContractAddress } from "./local-chain-data"
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { ethers, deployments, getNamedAccounts } from 'hardhat';
 import 'hardhat-deploy';
 import 'hardhat-deploy-ethers';
@@ -9,12 +7,7 @@ async function main() {
 
     const [owner, user1, user2, user3, user4, user5] = await ethers.getSigners();
     const users = [owner, user1, user2, user3, user4, user5];
-    //await deployments.fixture();
-    // const contractApple = await new ERC20Apple__factory(owner).attach(ContractAddress.ERC20Apple);
-    // const contractPotato = await new ERC20Potato__factory(owner).attach(ContractAddress.ERC20Potato);
-    // const contractLSRERC20 = await new ERC20LSR__factory(owner).attach(ContractAddress.ERC20LSR);
-    // const pancakeERC20 = await new PancakeERC20__factory(owner).attach(ContractAddress.PancakePair);
-    // const pancakeFactory = await new PancakeFactory__factory(owner).attach(ContractAddress.PancakeFactory);
+
     const contractApple = await ethers.getContract("ERC20Apple");
     const contractPotato = await ethers.getContract("ERC20Potato");
     const contractLSR = await ethers.getContract("ERC20LSR");
@@ -34,25 +27,31 @@ async function main() {
 
     console.log(`router \t${await contractApple.balanceOf(router_mod.address)}\t${await contractPotato.balanceOf(router_mod.address)}\t${await contractLSR.balanceOf(router_mod.address)}`);
 
-
     console.log(`Pairs:`);
-    try {
-        const nPairs = await pancakeFactory.allPairsLength();
-        console.log(`Factory contains ${nPairs.toString()} pair(s)`);
-        const pairAddress = await pancakeFactory.getPair(contractApple.address, contractPotato.address);
-        const pair: PancakePair = await new PancakePair__factory(owner).attach(pairAddress);
+
+    const nPairs = await pancakeFactory.allPairsLength();
+    console.log(`Factory contains ${nPairs.toString()} pair(s)`);
+    let pairs: PancakePair[] = [];
+    for (let i = 0; i < nPairs; i++) {
+        try {
+            const pairAddress = await pancakeFactory.allPairs(i);//.getPair(contractApple.address, contractPotato.address);
+            const pair: PancakePair = await new PancakePair__factory(owner).attach(pairAddress);
+            pairs.push(pair);
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
-    catch (error) {
-        console.error(error);
 
-    }
-
-    //let liqAmount = (await pair.balanceOf(user3.address)).toBigInt();//: BigInt = (await pair.balanceOf(user3.address)).toBigInt();
-
-    //console.log(`Liq tokens: ${liqAmount}`);
-
+    for (const pair of pairs) {
+        console.log(``);
+        console.log(`Pair address ${await pair.address}`);
+        console.log(`Tokens: ${await pair.token0()} and ${await pair.token1()}`);
+        const [reserve0, reserve1, time] = await pair.getReserves();
+        console.log(`Reserves are: ${reserve0.toString()}, ${reserve1.toString()}`);
+    };
 }
-
+// Naki
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;

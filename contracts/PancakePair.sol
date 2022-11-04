@@ -165,7 +165,6 @@ contract PancakePair is IPancakePair, ERC20Pancake {
         }
         require(liquidity > 0, "Pancake: INSUFFICIENT_LIQUIDITY_MINTED");
         _mint(to, liquidity);
-
         _update(balance0, balance1, _reserve0, _reserve1);
         if (feeOn) kLast = uint(reserve0).mul(reserve1); // reserve0 and reserve1 are up-to-date
         emit Mint(msg.sender, amount0, amount1);
