@@ -66,11 +66,12 @@ task("verifys", "Verifys accounts")
     // });
   });
 
-task("prepare", "Deploy, fund, add liq").setAction(
+task("testDEX", "Deploy, fund, add liq").setAction(
   async (_args, { ethers, run }) => {
     await run("run", { script: "scripts/fund-users.ts" });
-    await run("run", { script: "scripts/add-liquidity.ts" });
-    await run("run", { script: "scripts/swap.ts" });
+    await run("run", { script: "scripts/create-pairs.ts" });
+    await run("run", { script: "scripts/add-liquidityUNV.ts" });
+    await run("run", { script: "scripts/swapUNV.ts" });
     await run("run", { script: "scripts/dex-status.ts" });
 
   }

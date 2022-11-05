@@ -23,30 +23,38 @@ library PancakeLibrary {
     }
 
     // calculates the CREATE2 address for a pair without making any external calls
+    // function pairFor(
+    //     address factory,
+    //     address tokenA,
+    //     address tokenB
+    // ) internal pure returns (address pair) {
+    //     (address token0, address token1) = sortTokens(tokenA, tokenB);
+    //     pair = address(
+    //         uint256(
+    //             keccak256(
+    //                 abi.encodePacked(
+    //                     hex"ff",
+    //                     factory,
+    //                     keccak256(abi.encodePacked(token0, token1)),
+    //                     //hex"a5934690703a592a07e841ca29d5e5c79b5e22ed4749057bb216dc31100be1c0" // init code hash
+    //                     //hex"e2855dd3fc07f33b23ea10cc71107ad2912643a5d0e66da772f435915bf08b3c"
+    //                     //hex"cd1d23da9bd3ff589894b9335edbe60eda254017a2aae258486d69e8595820a6"
+    //                     //hex"295e3a9806e1c742fa923111c7ad15a89cbd839dd5f32fbae63647a4a57726c2"
+    //                     //hex"4c5a474492614006aea9ff99894ea2f1df6ccce92605471888e23d35a5827284"
+    //                     //hex"e395b74ef862cd62793fe5660e2c5390b34fbae784ddd18dc303ff75855b6872"
+    //                     //hex"554b7ee48ff0cf9c4ccf5a519f22618998be86a9a3c37daada732dadaeec0d63"
+    //                     hex"57aff24e11a7ef29682bc8ff117ae5a6fb5bf75e25158b4cb3707029763df768"
+    //                 )
+    //             )
+    //         )
+    //     );
+    // }
     function pairFor(
         address factory,
         address tokenA,
         address tokenB
-    ) internal pure returns (address pair) {
-        (address token0, address token1) = sortTokens(tokenA, tokenB);
-        pair = address(
-            uint256(
-                keccak256(
-                    abi.encodePacked(
-                        hex"ff",
-                        factory,
-                        keccak256(abi.encodePacked(token0, token1)),
-                        //hex"a5934690703a592a07e841ca29d5e5c79b5e22ed4749057bb216dc31100be1c0" // init code hash
-                        //hex"e2855dd3fc07f33b23ea10cc71107ad2912643a5d0e66da772f435915bf08b3c"
-                        //hex"cd1d23da9bd3ff589894b9335edbe60eda254017a2aae258486d69e8595820a6"
-                        //hex"295e3a9806e1c742fa923111c7ad15a89cbd839dd5f32fbae63647a4a57726c2"
-                        //hex"4c5a474492614006aea9ff99894ea2f1df6ccce92605471888e23d35a5827284"
-                        //hex"e395b74ef862cd62793fe5660e2c5390b34fbae784ddd18dc303ff75855b6872"
-                        hex"554b7ee48ff0cf9c4ccf5a519f22618998be86a9a3c37daada732dadaeec0d63"
-                    )
-                )
-            )
-        );
+    ) internal view returns (address pair) {
+        pair = IPancakeFactory(factory).getPair(tokenA, tokenB);
     }
 
     // fetches and sorts the reserves for a pair

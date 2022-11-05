@@ -18,7 +18,7 @@ async function main() {
 
     // SETUP
     const usr = user3;
-    const tokenA = "ERC20Potato";
+    const tokenA = "ERC20Apple";
     const tokenB = "ERC20LSR";
     const addReservesA = BigInt(100000).toString();
     const addReservesB = BigInt(200000).toString();

@@ -17,34 +17,38 @@ async function main() {
     let filter = await pancakeFactory.filters.PairCreated();
     let logs = await pancakeFactory.queryFilter(filter);
     console.log(`Pair Potato - Apple created successfully to ${logs[logs.length - 1].args.pair}`);
-
-    // Create Potato-LSR pair
-    await pancakeFactory.createPair(contractPotato.address, contractLSR.address);
-    filter = await pancakeFactory.filters.PairCreated();
-    logs = await pancakeFactory.queryFilter(filter);
-    console.log(`Pair Potato - LSR created successfully to ${logs[logs.length - 1].args.pair}`);
-
-    // Create LSR-Apple pair
-    await pancakeFactory.createPair(contractLSR.address, contractApple.address);
-    filter = await pancakeFactory.filters.PairCreated();
-    logs = await pancakeFactory.queryFilter(filter);
-    console.log(`Pair LSR - Apple created successfully to ${logs[logs.length - 1].args.pair}`);
-
-
-    // let receipt = await tx.wait();
-    // console.log(receipt.events);
-    // const pair_address = await pancakeFactory.getPair(contractPotato.address, contractApple.address);
-    // const pair = PancakePair__factory.connect(pair_address, owner);
-
-    // Check factory pairs
-    console.log(`Pairs created sucsesfully!`);
-    //console.log(await pancakeFactory.allPairs);
-
   }
   catch (err) {
     console.log(err);
   };
+  try {
+    // Create Potato-LSR pair
+    await pancakeFactory.createPair(contractPotato.address, contractLSR.address);
+    let filter = await pancakeFactory.filters.PairCreated();
+    let logs = await pancakeFactory.queryFilter(filter);
+    console.log(`Pair Potato - LSR created successfully to ${logs[logs.length - 1].args.pair}`);
+  }
+
+  catch (err) {
+    console.log(err);
+  };
+
+  // Create LSR-Apple pair
+  try {
+    await pancakeFactory.createPair(contractLSR.address, contractApple.address);
+    let filter = await pancakeFactory.filters.PairCreated();
+    let logs = await pancakeFactory.queryFilter(filter);
+    console.log(`Pair LSR - Apple created successfully to ${logs[logs.length - 1].args.pair}`);
+  }
+
+  catch (err) {
+    console.log(err);
+  };
+  // Check factory pairs
+  console.log(`Pairs created sucsesfully!`);
+  //console.log(await pancakeFactory.allPairs);
 }
+
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
