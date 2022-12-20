@@ -23,8 +23,6 @@ contract PancakeFactory is IPancakeFactory {
 
     constructor(address _feeToSetter) public {
         feeToSetter = _feeToSetter;
-        console.log("Hash:");
-        console.log(string(abi.encodePacked(INIT_CODE_PAIR_HASH)));
     }
 
     function allPairsLength() external view returns (uint) {
