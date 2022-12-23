@@ -1,7 +1,63 @@
-import { PancakeRouter_mod } from "../typechain-types";
+import {
+    PancakeRouter_mod,
+    ERC20LSR,
+    ERC20Apple,
+    ERC20Potato,
+    ERC20Tomato,
+    ERC20Basic,
+} from "../typechain-types";
 import { ethers } from "hardhat";
 import "hardhat-deploy";
 import "hardhat-deploy-ethers";
+import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
+
+interface IFundUser {
+    usr: SignerWithAddress;
+    amnt: BigInt;
+}
+
+function fundUsers(token: ERC20Basic, fundUsers: IFundUser[]): void {
+    const mintLimitAmount = BigInt(1000000);
+    fundUsers.forEach(async (fundUsr) => {
+        try {
+            const tx = await token
+                .connect(fundUsr.usr)
+                .getTokens(fundUsr.amnt.toString());
+            const receipt = await tx.wait();
+            let filterAmount = token.filters.MintRevertedAmount();
+            if (receipt.events != undefined) {
+                const timePassedSeconds =
+                    receipt.events[0].args?.timePassedSeconds;
+                if (timePassedSeconds != undefined) {
+                    console.log(`Passed only ${timePassedSeconds} seconds`);
+                }
+            }
+
+            // let filterPeriod = token.filters.MintRevertedPeriod();
+            // let logsPeriod = await token.queryFilter(filterPeriod);
+            // try {
+            //     console.log(
+            //         `Mint reverted due to requested amount. Requested ${
+            //             logsAmount[logsAmount.length - 1].args?.askedAmount
+            //         }, limit ${
+            //             logsAmount[logsAmount.length - 1].args?.mintLimitAmount
+            //         }`
+            //     );
+            // } catch {}
+            // try {
+            //     console.log(
+            //         `Mint reverted due to requested amount. Passed ${
+            //             logsPeriod[logsPeriod.length - 1].args.timePassedSeconds
+            //         }, limit ${
+            //             logsPeriod[logsPeriod.length - 1].args
+            //                 .mintLimitPeriodSeconds
+            //         }`
+            //     );
+        } catch (err) {
+            console.log(err);
+        }
+    });
+}
 
 async function main() {
     // Connetc to DEX
@@ -9,53 +65,41 @@ async function main() {
         await ethers.getSigners();
     const users = [owner, user1, user2, user3, user4, user5];
 
-    const contractApple = await ethers.getContract("ERC20Apple");
-    const contractPotato = await ethers.getContract("ERC20Potato");
-    const contractTomato = await ethers.getContract("ERC20Tomato");
-    const contractLSR = await ethers.getContract("ERC20LSR");
+    const contractApple: ERC20Basic = await ethers.getContract("ERC20Apple");
+    const contractPotato: ERC20Basic = await ethers.getContract("ERC20Potato");
+    const contractTomato: ERC20Basic = await ethers.getContract("ERC20Tomato");
+    const contractLSR: ERC20Basic = await ethers.getContract("ERC20LSR");
     const router_mod: PancakeRouter_mod = await ethers.getContract(
         "PancakeRouter_mod"
     );
-    //@todo
-
-    const appleAmount = BigInt(1000000);
-    const lsrAmount = BigInt(1000000);
-    const potatoAmount = BigInt(1000000);
-    const tomatoAmount = BigInt(1000000);
 
     // Fund with Apple
-    await contractApple.connect(user1).getTokens(appleAmount.toString());
-    await contractApple.connect(user2).getTokens(appleAmount.toString());
-    await contractApple.connect(user3).getTokens(appleAmount.toString());
-    await contractApple.connect(owner).getTokens(appleAmount.toString());
+    fundUsers(contractApple, [
+        { usr: owner, amnt: BigInt(1000000) },
+        { usr: user1, amnt: BigInt(1000000) },
+        { usr: user2, amnt: BigInt(1000000) },
+    ]);
 
     //Fund with Potato
-    //await contractPotato.connect(user2).getTokens(potatoAmount.toString());
-    await contractPotato.connect(user3).getTokens(potatoAmount.toString());
-    //await contractPotato.connect(user4).getTokens(potatoAmount.toString());
-
-    //Fund with LSR
-    await contractLSR.connect(owner).getTokens(lsrAmount.toString());
-    await contractLSR.connect(user3).getTokens(lsrAmount.toString());
+    fundUsers(contractPotato, [
+        { usr: owner, amnt: BigInt(1000000) },
+        { usr: user1, amnt: BigInt(1000000) },
+    ]);
 
     //Fund with Tomato
-    await contractTomato.connect(owner).getTokens(tomatoAmount.toString());
-    await contractTomato.connect(user2).getTokens(tomatoAmount.toString());
-    await contractTomato.connect(user3).getTokens(tomatoAmount.toString());
+    fundUsers(contractTomato, [
+        { usr: owner, amnt: BigInt(1000000) },
+        { usr: user1, amnt: BigInt(1000000) },
+    ]);
+
+    //Fund with LSR
+    fundUsers(contractLSR, [
+        { usr: owner, amnt: BigInt(1000000) },
+        { usr: user1, amnt: BigInt(1000000) },
+        { usr: user3, amnt: BigInt(1000000) },
+    ]);
 
     console.log(`Funded successfully`);
-
-    for (const usr of users) {
-        await contractApple
-            .connect(usr)
-            .approve(router_mod.address, 9999999999999);
-        await contractPotato
-            .connect(usr)
-            .approve(router_mod.address, 9999999999999);
-        await contractLSR
-            .connect(usr)
-            .approve(router_mod.address, 9999999999999);
-    }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
