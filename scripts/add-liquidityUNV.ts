@@ -58,11 +58,11 @@ async function main() {
         contractA.address,
         contractB.address
     );
-    const pair: PancakePair = await new PancakePair__factory(owner).attach(
+    const pair: PancakePair = new PancakePair__factory(owner).attach(
         pairAddress
     );
 
-    let filter = await pair.filters.Mint();
+    let filter = pair.filters.Mint();
     let logs = await pair.queryFilter(filter);
     console.log(
         `Mint: Sender  ${logs[logs.length - 1].args.sender}, amount0 ${

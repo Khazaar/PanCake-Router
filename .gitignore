@@ -11,7 +11,5 @@ secrets.json
 #Hardhat files
 cache
 artifacts
-
-// Tenderly token
-//i04VXnJlHbC0n976qhKLplLtOYxN9JDD
-
+notes.md
+tasks.md
