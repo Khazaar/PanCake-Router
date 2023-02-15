@@ -57,14 +57,11 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
         assert(msg.sender == WETH); // only accept ETH via fallback from the WETH contract
     }
 
-    function setAdminAddress(address _adminAddress) public onlyOwner {
-        //require(!_admins.has(_adminAddress), "Address is already an admin");
-        console.log("Old admin ", adminAddress);
+    function setAdminAddress(address _adminAddress) public {
+        require(hasRole(OWNER_ROLE, msg.sender), "Prohibited for non owner");
         revokeRole(ADMIN_ROLE, adminAddress);
         grantRole(ADMIN_ROLE, _adminAddress);
         adminAddress = _adminAddress;
-        console.log("New admin ", _adminAddress);
-        //console.log("Admin set to %s", adminAddress);
     }
 
     function getAdminAddress() public view returns (address) {
@@ -72,14 +69,13 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
     }
 
     function withdrawFees(address _token) public {
-        //require(_admins.has(msg.sender), "DOES_NOT_HAVE_ADMIN_ROLE");
+        require(hasRole(ADMIN_ROLE, msg.sender), "Prohibited for non admins");
         uint256 totalBalance = IERC20(_token).balanceOf(address(this));
-        IERC20(_token).transfer(owner(), totalBalance);
+        IERC20(_token).transfer(msg.sender, totalBalance);
         emit WithdrawFees(_token, totalBalance);
     }
 
     function setSwapFee(uint256 _swapFee) public {
-        //require(_admins.has(msg.sender), "DOES_NOT_HAVE_ADMIN_ROLE");
         require(hasRole(ADMIN_ROLE, msg.sender), "Prohibited for non admins");
         swapFee = _swapFee;
         emit SetSwapFee(_swapFee);
@@ -90,7 +86,7 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
     }
 
     function setLsrMinBalance(uint256 _lsrMinBalance) public {
-        //require(_admins.has(msg.sender), "DOES_NOT_HAVE_ADMIN_ROLE");
+        require(hasRole(ADMIN_ROLE, msg.sender), "Prohibited for non admins");
         lsrMinBalance = _lsrMinBalance;
         emit SetLsrMinBalance(_lsrMinBalance);
     }
@@ -308,12 +304,6 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
             );
             emit FeeCharged(path[0], fee);
         }
-
-        //console.log("Fee is");
-        //console.log(fee);
-
-        console.log("dbgend");
-
         amountIn = amountIn - fee;
 
         require(

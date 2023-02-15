@@ -8,6 +8,7 @@ import { task } from "hardhat/config";
 import "@nomiclabs/hardhat-ethers";
 import "hardhat-contract-sizer";
 import "@nomiclabs/hardhat-etherscan";
+import "solidity-coverage";
 
 const {
     MNEMONIC,
