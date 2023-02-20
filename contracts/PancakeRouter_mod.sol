@@ -22,6 +22,7 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
     address public immutable override WETH;
     //address public pairAddress;
     address private adminAddress;
+    address private ownerAddress;
     uint256 private swapFee = 10; // divide by 10000
     uint256 private lsrMinBalance = 100; //minimum LSR balance to avoid swapFee
     ERC20LSR lsr;
@@ -49,7 +50,9 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
         WETH = _WETH;
         lsr = ERC20LSR(_LSRAddress);
         adminAddress = msg.sender;
+        ownerAddress = msg.sender;
         _setupRole(OWNER_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, msg.sender);
         _setRoleAdmin(ADMIN_ROLE, OWNER_ROLE);
     }
 
@@ -66,6 +69,9 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
 
     function getAdminAddress() public view returns (address) {
         return adminAddress;
+    }
+    function getOwnerAddress() public view returns (address) {
+        return ownerAddress;
     }
 
     function withdrawFees(address _token) public {

@@ -167,79 +167,8 @@ describe("Router test", function () {
             const [reserve0, reserve1] = await contractPair.getReserves();
             expect(reserve0).to.equal(appleAmount);
         });
-    });
-
-    it("Swap APL to PTT", async () => {
-        const {
-            user1,
-            user3,
-            contractApple,
-            contractPotato,
-            contractRouter_mod,
-            pancakeFactory,
-        } = await loadFixture(deployRouterFixture);
-        const appleLiqAmount = BigInt(100000);
-        const potatoLiqAmount = BigInt(100000);
-        // Get and Approve
-        await contractApple.connect(user3).getTokens(appleLiqAmount.toString());
-        await contractPotato
-            .connect(user3)
-            .getTokens(potatoLiqAmount.toString());
-        await contractApple
-            .connect(user3)
-            .approve(contractRouter_mod.address, appleLiqAmount.toString());
-        await contractPotato
-            .connect(user3)
-            .approve(contractRouter_mod.address, appleLiqAmount.toString());
-        // Add liquidity
-        let tx = await contractRouter_mod
-            .connect(user3)
-            .addLiquidity(
-                contractApple.address,
-                contractPotato.address,
-                appleLiqAmount,
-                potatoLiqAmount,
-                appleLiqAmount,
-                potatoLiqAmount,
-                user3.address,
-                216604939048
-            );
-        await tx.wait(1);
-
-        // Get and approve to user1
-        const appleSwapAmount = BigInt(10000);
-        await contractApple
-            .connect(user1)
-            .getTokens(appleSwapAmount.toString());
-        await contractApple
-            .connect(user1)
-            .approve(contractRouter_mod.address, appleLiqAmount.toString());
-        tx = await contractRouter_mod
-            .connect(user1)
-            .swapExactTokensForTokens(
-                appleSwapAmount,
-                1,
-                [contractApple.address, contractPotato.address],
-                user1.address,
-                216604939048
-            );
-        await tx.wait(1);
-        const supposedSlippage = 0.1;
-
-        expect(await contractApple.balanceOf(user1.address)).to.equal(0);
-        expect(await contractPotato.balanceOf(user1.address)).to.approximately(
-            appleSwapAmount,
-            BigInt(
-                (appleSwapAmount.toString() as unknown as number) *
-                    supposedSlippage
-            )
-        );
-    });
-
-    describe("Admin features", () => {
-        it("Set admin address successful", async () => {
+        it("Swap APL to PTT", async () => {
             const {
-                owner,
                 user1,
                 user3,
                 contractApple,
@@ -247,6 +176,74 @@ describe("Router test", function () {
                 contractRouter_mod,
                 pancakeFactory,
             } = await loadFixture(deployRouterFixture);
+            const appleLiqAmount = BigInt(100000);
+            const potatoLiqAmount = BigInt(100000);
+            // Get and Approve
+            await contractApple
+                .connect(user3)
+                .getTokens(appleLiqAmount.toString());
+            await contractPotato
+                .connect(user3)
+                .getTokens(potatoLiqAmount.toString());
+            await contractApple
+                .connect(user3)
+                .approve(contractRouter_mod.address, appleLiqAmount.toString());
+            await contractPotato
+                .connect(user3)
+                .approve(contractRouter_mod.address, appleLiqAmount.toString());
+            // Add liquidity
+            let tx = await contractRouter_mod
+                .connect(user3)
+                .addLiquidity(
+                    contractApple.address,
+                    contractPotato.address,
+                    appleLiqAmount,
+                    potatoLiqAmount,
+                    appleLiqAmount,
+                    potatoLiqAmount,
+                    user3.address,
+                    216604939048
+                );
+            await tx.wait(1);
+
+            // Get and approve to user1
+            const appleSwapAmount = BigInt(10000);
+            await contractApple
+                .connect(user1)
+                .getTokens(appleSwapAmount.toString());
+            await contractApple
+                .connect(user1)
+                .approve(contractRouter_mod.address, appleLiqAmount.toString());
+            tx = await contractRouter_mod
+                .connect(user1)
+                .swapExactTokensForTokens(
+                    appleSwapAmount,
+                    1,
+                    [contractApple.address, contractPotato.address],
+                    user1.address,
+                    216604939048
+                );
+            await tx.wait(1);
+            const supposedSlippage = 0.1;
+
+            expect(await contractApple.balanceOf(user1.address)).to.equal(0);
+            expect(
+                await contractPotato.balanceOf(user1.address)
+            ).to.approximately(
+                appleSwapAmount,
+                BigInt(
+                    (appleSwapAmount.toString() as unknown as number) *
+                        supposedSlippage
+                )
+            );
+        });
+    });
+
+    describe("Admin features", () => {
+        it("Set admin address successful", async () => {
+            const { owner, user1, contractRouter_mod } = await loadFixture(
+                deployRouterFixture
+            );
             await contractRouter_mod
                 .connect(owner)
                 .setAdminAddress(user1.address);
@@ -256,14 +253,9 @@ describe("Router test", function () {
         });
 
         it("Try set admin without owner role", async () => {
-            const {
-                user1,
-                user2,
-                contractApple,
-                contractPotato,
-                contractRouter_mod,
-                pancakeFactory,
-            } = await loadFixture(deployRouterFixture);
+            const { user1, user2, contractRouter_mod } = await loadFixture(
+                deployRouterFixture
+            );
             await contractRouter_mod.setAdminAddress(user1.address);
             const swapFee = 10; // divide by 10000
             let errMessage: string = "";
@@ -281,14 +273,9 @@ describe("Router test", function () {
         });
 
         it("Set fee successful", async () => {
-            const {
-                user1,
-                user3,
-                contractApple,
-                contractPotato,
-                contractRouter_mod,
-                pancakeFactory,
-            } = await loadFixture(deployRouterFixture);
+            const { user1, contractRouter_mod } = await loadFixture(
+                deployRouterFixture
+            );
             await contractRouter_mod.setAdminAddress(user1.address);
             const swapFee = 10; // divide by 10000
             await contractRouter_mod.connect(user1).setSwapFee(swapFee);
@@ -297,20 +284,28 @@ describe("Router test", function () {
             ).to.equal(swapFee);
         });
 
-        it("Try set fee without admin roles", async () => {
-            const {
-                user1,
-                user2,
-                contractApple,
-                contractPotato,
-                contractRouter_mod,
-                pancakeFactory,
-            } = await loadFixture(deployRouterFixture);
+        it("Set LSR Min balance successful", async () => {
+            const { user1, contractRouter_mod } = await loadFixture(
+                deployRouterFixture
+            );
             await contractRouter_mod.setAdminAddress(user1.address);
+            const lsrMinBalance = 10; // divide by 10000
+            await contractRouter_mod
+                .connect(user1)
+                .setLsrMinBalance(lsrMinBalance);
+            expect(
+                await contractRouter_mod.connect(user1).getLsrMinBalance()
+            ).to.equal(lsrMinBalance);
+        });
+
+        it("Try set fee without admin roles", async () => {
+            const { owner, user1, user2, contractRouter_mod } =
+                await loadFixture(deployRouterFixture);
+            //await contractRouter_mod.setAdminAddress(user1.address);
             const swapFee = 10; // divide by 10000
             let errMessage: string = "";
             try {
-                await contractRouter_mod.connect(user2).setSwapFee(swapFee);
+                await contractRouter_mod.connect(owner).setSwapFee(swapFee);
             } catch (error) {
                 errMessage = (error as Error).message;
                 console.log(errMessage);
@@ -351,7 +346,6 @@ describe("Router test", function () {
                 .connect(owner)
                 .setAdminAddress(user1.address);
             const swapFee = 10; // divide by 10000
-
             await contractRouter_mod.connect(user1).setSwapFee(swapFee);
 
             // Add liquidity
