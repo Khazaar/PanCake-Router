@@ -4,7 +4,6 @@ pragma solidity =0.6.6;
 import "./interfaces/IPancakeRouter02mod.sol";
 import "./interfaces/IPancakeFactory.sol";
 import "./interfaces/IERC20.sol";
-//import "./interfaces/IWETH.sol";
 
 import "./libraries/PancakeLibrary.sol";
 import "./libraries/SafeMath.sol";
@@ -12,15 +11,15 @@ import "./libraries/TransferHelper.sol";
 
 import "hardhat/console.sol";
 import "./ERC20LSR.sol";
-import "./access/AccessControl.sol";
-import "./access/Ownable.sol";
+import "./access/AccessControlEnumerable.sol";
 
-contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
+contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
     using SafeMath for uint256;
+    mapping(address => bool) public isAdmin;
 
     address public immutable override factory;
     address public immutable override WETH;
-    //address public pairAddress;
+
     address private adminAddress;
     address private ownerAddress;
     uint256 private swapFee = 10; // divide by 10000
@@ -61,10 +60,13 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
     }
 
     function setAdminAddress(address _adminAddress) public {
-        require(hasRole(OWNER_ROLE, msg.sender), "Prohibited for non owner");
-        revokeRole(ADMIN_ROLE, adminAddress);
         grantRole(ADMIN_ROLE, _adminAddress);
         adminAddress = _adminAddress;
+    }
+
+    function revokeAdminAddress(address _adminAddress) public {
+        require(hasRole(ADMIN_ROLE, _adminAddress), "Adress is not admin");
+        revokeRole(ADMIN_ROLE, _adminAddress);
     }
 
     function getAdminAddress() public view returns (address) {
