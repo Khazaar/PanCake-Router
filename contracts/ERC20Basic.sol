@@ -15,9 +15,9 @@ contract ERC20Basic is ERC20 ,AccessControlEnumerable {
         ERC20(name_, symbol_)
     {
         _setupRole(OWNER_ROLE, msg.sender);
-        setMintLimitAmount(1000000);
+        setMintLimitAmount(100000);
         //60*60*0.01; // 1 hour 
-        setMintLimitPeriodSeconds(600);
+        setMintLimitPeriodSeconds(36000);
     }
     
     event MintRevertedAmount(uint256 indexed askedAmount, uint256 indexed mintLimitAmount);
