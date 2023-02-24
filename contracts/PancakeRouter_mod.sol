@@ -29,7 +29,7 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
     bytes32 public constant ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
     bytes32 public constant OWNER_ROLE = keccak256(abi.encodePacked("OWNER"));
 
-    event WithdrawFees(address indexed _token, uint256 _totalBalance);
+    event WithdrawFees(address indexed _token, uint256 amount);
     event SetSwapFee(uint256 indexed _swapFee);
     event SetLsrMinBalance(uint256 indexed _lsrMinBalance);
     event AddLiquidity(uint256 indexed amountA, uint256 indexed amountB);
@@ -71,11 +71,12 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
         return ownerAddress;
     }
 
-    function withdrawFees(address _token) public {
+    function withdrawFees(address _token, uint256 amount) public {
         require(hasRole(ADMIN_ROLE, msg.sender), "Prohibited for non admins");
         uint256 totalBalance = IERC20(_token).balanceOf(address(this));
-        IERC20(_token).transfer(msg.sender, totalBalance);
-        emit WithdrawFees(_token, totalBalance);
+        require(totalBalance>amount, "Insufficient balance");
+        IERC20(_token).transfer(msg.sender, amount);
+        emit WithdrawFees(_token, amount);
     }
 
     function setSwapFee(uint256 _swapFee) public {
