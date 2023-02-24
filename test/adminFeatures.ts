@@ -2,53 +2,54 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { deployRouterFixture } from "./deployFixture";
 import { ethers } from "hardhat";
+import { int } from "hardhat/internal/core/params/argumentTypes";
 const ADMIN_ROLE = ethers.utils.solidityKeccak256(["string"], ["ADMIN"]);
 
 describe("Admin features", () => {
-    it("Set admin address successful", async () => {
-        const { owner, user1, contractRouter_mod } = await loadFixture(
-            deployRouterFixture
-        );
-        await contractRouter_mod.connect(owner).setAdminAddress(user1.address);
-        expect(await contractRouter_mod.getAdminAddress()).to.equal(
-            user1.address
-        );
-    });
-    it("Set 2 more admins", async () => {
+    it("Set 2 admins", async () => {
         const { owner, user1, user2, user3, contractRouter_mod } =
             await loadFixture(deployRouterFixture);
-        await contractRouter_mod.connect(owner).setAdminAddress(user1.address);
-        await contractRouter_mod.connect(owner).setAdminAddress(user2.address);
+        const admins = [];
+        await contractRouter_mod.connect(owner).addAdminAddress(user1.address);
+        await contractRouter_mod.connect(owner).addAdminAddress(user2.address);
 
-        const minterCount = await contractRouter_mod.getRoleMemberCount(
-            ADMIN_ROLE
-        );
-        expect(minterCount).to.equal(BigInt(3));
+        let adminCount = (
+            await contractRouter_mod.getRoleMemberCount(ADMIN_ROLE)
+        ).toNumber();
+        for (let i = 0; i < adminCount; ++i) {
+            admins.push(await contractRouter_mod.getRoleMember(ADMIN_ROLE, i));
+        }
+        expect(admins).to.include(user1.address);
+        expect(admins).to.include(user2.address);
+        expect(admins).to.include(owner.address);
     });
     it("Revoke admin", async () => {
         const { owner, user1, user2, user3, contractRouter_mod } =
             await loadFixture(deployRouterFixture);
-        await contractRouter_mod.connect(owner).setAdminAddress(user1.address);
+        const admins = [];
+        await contractRouter_mod.connect(owner).addAdminAddress(user1.address);
         await contractRouter_mod
             .connect(owner)
             .revokeAdminAddress(user1.address);
-
-        const minterCount = await contractRouter_mod.getRoleMemberCount(
-            ADMIN_ROLE
-        );
-        expect(minterCount).to.equal(BigInt(1));
+        let adminCount = (
+            await contractRouter_mod.getRoleMemberCount(ADMIN_ROLE)
+        ).toNumber();
+        for (let i = 0; i < adminCount; ++i) {
+            admins.push(await contractRouter_mod.getRoleMember(ADMIN_ROLE, i));
+        }
+        expect(admins).to.not.include(user1.address);
     });
     it("Try set admin without owner role", async () => {
         const { user1, user2, contractRouter_mod } = await loadFixture(
             deployRouterFixture
         );
-        await contractRouter_mod.setAdminAddress(user1.address);
+        await contractRouter_mod.addAdminAddress(user1.address);
         const swapFee = 10; // divide by 10000
         let errMessage: string = "";
         try {
             await contractRouter_mod
                 .connect(user2)
-                .setAdminAddress(user1.address);
+                .addAdminAddress(user1.address);
         } catch (error) {
             errMessage = (error as Error).message;
             //console.log(errMessage);
@@ -61,7 +62,7 @@ describe("Admin features", () => {
         const { user1, contractRouter_mod } = await loadFixture(
             deployRouterFixture
         );
-        await contractRouter_mod.setAdminAddress(user1.address);
+        await contractRouter_mod.addAdminAddress(user1.address);
         const swapFee = 10; // divide by 10000
         await contractRouter_mod.connect(user1).setSwapFee(swapFee);
         expect(await contractRouter_mod.connect(user1).getSwapFee()).to.equal(
@@ -72,7 +73,7 @@ describe("Admin features", () => {
         const { user1, contractRouter_mod } = await loadFixture(
             deployRouterFixture
         );
-        await contractRouter_mod.setAdminAddress(user1.address);
+        await contractRouter_mod.addAdminAddress(user1.address);
         const lsrMinBalance = 10; // divide by 10000
         await contractRouter_mod.connect(user1).setLsrMinBalance(lsrMinBalance);
         expect(
@@ -122,7 +123,7 @@ describe("Admin features", () => {
             .approve(contractRouter_mod.address, appleLiqAmount.toString());
 
         // Set user1 as admin
-        await contractRouter_mod.connect(owner).setAdminAddress(user1.address);
+        await contractRouter_mod.connect(owner).addAdminAddress(user1.address);
         const swapFee = 10; // divide by 10000
         await contractRouter_mod.connect(user1).setSwapFee(swapFee);
 

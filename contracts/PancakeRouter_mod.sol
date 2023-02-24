@@ -48,7 +48,6 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
         factory = _factory;
         WETH = _WETH;
         lsr = ERC20LSR(_LSRAddress);
-        adminAddress = msg.sender;
         ownerAddress = msg.sender;
         _setupRole(OWNER_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -59,19 +58,15 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
         assert(msg.sender == WETH); // only accept ETH via fallback from the WETH contract
     }
 
-    function setAdminAddress(address _adminAddress) public {
+    function addAdminAddress(address _adminAddress) public {
         grantRole(ADMIN_ROLE, _adminAddress);
         adminAddress = _adminAddress;
     }
 
     function revokeAdminAddress(address _adminAddress) public {
-        require(hasRole(ADMIN_ROLE, _adminAddress), "Adress is not admin");
         revokeRole(ADMIN_ROLE, _adminAddress);
     }
 
-    function getAdminAddress() public view returns (address) {
-        return adminAddress;
-    }
     function getOwnerAddress() public view returns (address) {
         return ownerAddress;
     }
