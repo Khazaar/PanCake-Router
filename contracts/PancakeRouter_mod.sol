@@ -33,7 +33,8 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
     event SetSwapFee(uint256 indexed _swapFee);
     event SetLsrMinBalance(uint256 indexed _lsrMinBalance);
     event AddLiquidity(uint256 indexed amountA, uint256 indexed amountB);
-    event FeeCharged(address indexed _token, uint256 indexed _fee);
+    event RemoveLiquidity(uint256 indexed amount0, uint256 indexed amount1);
+    event FeeCharged(address indexed token, uint256 indexed fee);
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "PancakeRouter: EXPIRED");
@@ -74,7 +75,7 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
     function withdrawFees(address _token, uint256 amount) public {
         require(hasRole(ADMIN_ROLE, msg.sender), "Prohibited for non admins");
         uint256 totalBalance = IERC20(_token).balanceOf(address(this));
-        require(totalBalance>amount, "Insufficient balance");
+        require(totalBalance>=amount, "Insufficient balance");
         IERC20(_token).transfer(msg.sender, amount);
         emit WithdrawFees(_token, amount);
     }
@@ -147,7 +148,7 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
                     "PancakeRouter: INSUFFICIENT_A_AMOUNT"
                 );
                 (amountA, amountB) = (amountAOptimal, amountBDesired);
-                emit AddLiquidity(amountA, amountB);
+                
             }
         }
     }
@@ -185,6 +186,7 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
         TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
         TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);
         liquidity = IPancakePair(pair).mint(to);
+        emit AddLiquidity(amountA, amountB);
     }
 
     // **** REMOVE LIQUIDITY ****
@@ -212,6 +214,7 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
             : (amount1, amount0);
         require(amountA >= amountAMin, "PancakeRouter: INSUFFICIENT_A_AMOUNT");
         require(amountB >= amountBMin, "PancakeRouter: INSUFFICIENT_B_AMOUNT");
+        emit RemoveLiquidity(amount0,amount1);
     }
 
     function removeLiquidityWithPermit(
