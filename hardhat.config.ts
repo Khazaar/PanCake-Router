@@ -13,7 +13,8 @@ import "solidity-coverage";
 const {
     MNEMONIC,
     bscscanApiKey,
-    ALCHEMY_API_KEY,
+    ALCHEMY_API_KEY_GOERLI,
+    ALCHEMY_API_KEY_SEPOLIA,
     GOERLI_PRIVATE_KEY,
     etherscanApiKey,
 } = require("./secrets.json");
@@ -34,43 +35,34 @@ task("accounts", "Prints the list of accounts").setAction(async (args, hre) => {
 
 task("verifys", "Verifys contracts").setAction(
     async (_args, { ethers, run }) => {
-        // await run("verify", {
-        //     address: "0x2757E1767543dCeC9C76ed128d3f8e86d2f3901B",
-        //     contract: "contracts/ERC20Apple.sol:ERC20Apple",
-        // });
-        // await run("verify", {
-        //     address: "0xe0B81076Fa915a280f03bFb746A4F5873578E287",
-        //     contract: "contracts/ERC20LSR.sol:ERC20LSR",
-        // });
-        // await run("verify", {
-        //     address: "0x0A41D46f01A8A9EeBdEc130c9a926aFc4a97B6dE",
-        //     contract: "contracts/ERC20Tomato.sol:ERC20Tomato",
-        // });
-        // // await run("verify", {
-        // //     address: "0xE73a67F72b94c13fEc798D54a90d0A277DD16E71",
-        // //     contract: "contracts/ERC20Pancake.sol:ERC20Pancake",
-        // // });
-        // await run("verify", {
-        //     address: "0x54C569b56fbf38C8AC9942b7011a3653e5073FD4",
-        //     contract: "contracts/ERC20Potato.sol:ERC20Potato",
-        // });
-        // await run("verify", {
-        //     address: "0xB48475F43de9BF5Fcd2fce228F74F9B5F80E73F6",
-        //     contract: "contracts/PancakeFactory.sol:PancakeFactory",
-        //     constructorArgsParams: [`${ethers.constants.AddressZero}`],
-        // });
-        // // await run("verify", {
-        // //     address: "0xEaa96e643d817D7DE691D8992d7535aaD458c6DD",
-        // //     contract: "contracts/PancakePair.sol:PancakePair",
-        // // });
-
         await run("verify", {
-            address: "0x7d29E9366C3022F30a8fd72ef59CaC95BC9e8B72",
+            address: "0xF3B0Bf3cdC24ae7d9FC7Df08B98E2a3d30071b8f",
+            contract: "contracts/ERC20Apple.sol:ERC20Apple",
+        });
+        await run("verify", {
+            address: "0xF8E133c6B4bC73d89723B138E0654AeaAD11Bd21",
+            contract: "contracts/ERC20LSR.sol:ERC20LSR",
+        });
+        await run("verify", {
+            address: "0xac3849A6d4b0a97eC86998F6e0cC531D66F5Fa82",
+            contract: "contracts/ERC20Tomato.sol:ERC20Tomato",
+        });
+        await run("verify", {
+            address: "0x4075B23f1D93e99439eC078BB3E59712FE19B53A",
+            contract: "contracts/ERC20Potato.sol:ERC20Potato",
+        });
+        await run("verify", {
+            address: "0xfA85901DBeB559EBA2d15bdc1c9EdfC14D880cAC",
+            contract: "contracts/PancakeFactory.sol:PancakeFactory",
+            constructorArgsParams: [`${ethers.constants.AddressZero}`],
+        });
+        await run("verify", {
+            address: "0xf1f8c1B19e56f34220B2eef5B19a15c2DF504f5F",
             contract: "contracts/PancakeRouter_mod.sol:PancakeRouter_mod",
             constructorArgsParams: [
-                `0xB48475F43de9BF5Fcd2fce228F74F9B5F80E73F6`,
+                `0xfA85901DBeB559EBA2d15bdc1c9EdfC14D880cAC`,
                 `${ethers.constants.AddressZero}`,
-                `0xe0B81076Fa915a280f03bFb746A4F5873578E287`,
+                `0xF8E133c6B4bC73d89723B138E0654AeaAD11Bd21`,
             ],
         });
     }
@@ -87,9 +79,7 @@ task("testDEX", "Deploy, fund, add liq").setAction(
 );
 
 const config: HardhatUserConfig = {
-    //defaultNetwork: "localhost",
     defaultNetwork: "hardhat",
-    //chainId: 31337,
     networks: {
         hardhat: {
             allowUnlimitedContractSize: true,
@@ -108,15 +98,14 @@ const config: HardhatUserConfig = {
             accounts: { mnemonic: MNEMONIC },
             timeout: 1000000,
         },
-        mainnet: {
-            url: "https://bsc-dataseed.binance.org/",
-            chainId: 56,
-            gasPrice: 20000000000,
+
+        goerli: {
+            url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY_GOERLI}`,
             accounts: { mnemonic: MNEMONIC },
         },
-        goerli: {
-            url: `https://eth-goerli.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-            gasPrice: 20000000000,
+
+        sepolia: {
+            url: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY_SEPOLIA}`,
             accounts: { mnemonic: MNEMONIC },
         },
     },

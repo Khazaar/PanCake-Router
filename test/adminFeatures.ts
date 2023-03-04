@@ -162,7 +162,10 @@ describe("Admin features", () => {
         await tx.wait(1);
         tx = await contractRouter_mod
             .connect(user1)
-            .withdrawFees(contractApple.address);
+            .withdrawFees(
+                contractApple.address,
+                contractApple.balanceOf(user1.address)
+            );
         const feeWithdrawn = await contractApple.balanceOf(user1.address);
         expect(feeWithdrawn).to.equal(
             BigInt(

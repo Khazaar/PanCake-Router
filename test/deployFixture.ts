@@ -3,7 +3,6 @@ import { run } from "hardhat";
 
 import {
     PancakeFactory,
-    PancakePair,
     PancakeRouter_mod,
     ERC20Apple,
     ERC20Potato,
@@ -16,9 +15,6 @@ export const deployRouterFixture = async () => {
     const contractApple: ERC20Apple = await ethers.getContract("ERC20Apple");
     const contractPotato: ERC20Potato = await ethers.getContract("ERC20Potato");
     const contractLSR: ERC20LSR = await ethers.getContract("ERC20LSR");
-    const contractPancake: PancakePair = await ethers.getContract(
-        "ERC20Pancake"
-    );
     const pancakeFactory: PancakeFactory = await ethers.getContract(
         "PancakeFactory"
     );
@@ -33,7 +29,6 @@ export const deployRouterFixture = async () => {
         user3,
         contractApple,
         contractPotato,
-        contractPancake,
         contractRouter_mod,
         pancakeFactory,
     };

@@ -100,10 +100,6 @@ contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
         return lsrMinBalance;
     }
 
-    // function setPairAddress(address _pair) public {
-    //     pairAddress = _pair;
-    // }
-
     // **** ADD LIQUIDITY ****
     function _addLiquidity(
         address tokenA,
