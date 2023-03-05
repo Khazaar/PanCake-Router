@@ -4,7 +4,6 @@ pragma solidity =0.6.6;
 import "./interfaces/IPancakeRouter02mod.sol";
 import "./interfaces/IPancakeFactory.sol";
 import "./interfaces/IERC20.sol";
-//import "./interfaces/IWETH.sol";
 
 import "./libraries/PancakeLibrary.sol";
 import "./libraries/SafeMath.sol";
@@ -12,15 +11,15 @@ import "./libraries/TransferHelper.sol";
 
 import "hardhat/console.sol";
 import "./ERC20LSR.sol";
-import "./access/AccessControl.sol";
-import "./access/Ownable.sol";
+import "./access/AccessControlEnumerable.sol";
 
-contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
+contract PancakeRouter_mod is IPancakeRouter02, AccessControlEnumerable {
     using SafeMath for uint256;
+    mapping(address => bool) public isAdmin;
 
     address public immutable override factory;
     address public immutable override WETH;
-    //address public pairAddress;
+
     address private adminAddress;
     address private ownerAddress;
     uint256 private swapFee = 10; // divide by 10000
@@ -30,11 +29,12 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
     bytes32 public constant ADMIN_ROLE = keccak256(abi.encodePacked("ADMIN"));
     bytes32 public constant OWNER_ROLE = keccak256(abi.encodePacked("OWNER"));
 
-    event WithdrawFees(address indexed _token, uint256 _totalBalance);
+    event WithdrawFees(address indexed _token, uint256 amount);
     event SetSwapFee(uint256 indexed _swapFee);
     event SetLsrMinBalance(uint256 indexed _lsrMinBalance);
     event AddLiquidity(uint256 indexed amountA, uint256 indexed amountB);
-    event FeeCharged(address indexed _token, uint256 indexed _fee);
+    event RemoveLiquidity(uint256 indexed amount0, uint256 indexed amount1);
+    event FeeCharged(address indexed token, uint256 indexed fee);
 
     modifier ensure(uint256 deadline) {
         require(deadline >= block.timestamp, "PancakeRouter: EXPIRED");
@@ -49,7 +49,6 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
         factory = _factory;
         WETH = _WETH;
         lsr = ERC20LSR(_LSRAddress);
-        adminAddress = msg.sender;
         ownerAddress = msg.sender;
         _setupRole(OWNER_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -60,25 +59,25 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
         assert(msg.sender == WETH); // only accept ETH via fallback from the WETH contract
     }
 
-    function setAdminAddress(address _adminAddress) public {
-        require(hasRole(OWNER_ROLE, msg.sender), "Prohibited for non owner");
-        revokeRole(ADMIN_ROLE, adminAddress);
+    function addAdminAddress(address _adminAddress) public {
         grantRole(ADMIN_ROLE, _adminAddress);
         adminAddress = _adminAddress;
     }
 
-    function getAdminAddress() public view returns (address) {
-        return adminAddress;
+    function revokeAdminAddress(address _adminAddress) public {
+        revokeRole(ADMIN_ROLE, _adminAddress);
     }
+
     function getOwnerAddress() public view returns (address) {
         return ownerAddress;
     }
 
-    function withdrawFees(address _token) public {
+    function withdrawFees(address _token, uint256 amount) public {
         require(hasRole(ADMIN_ROLE, msg.sender), "Prohibited for non admins");
         uint256 totalBalance = IERC20(_token).balanceOf(address(this));
-        IERC20(_token).transfer(msg.sender, totalBalance);
-        emit WithdrawFees(_token, totalBalance);
+        require(totalBalance>=amount, "Insufficient balance");
+        IERC20(_token).transfer(msg.sender, amount);
+        emit WithdrawFees(_token, amount);
     }
 
     function setSwapFee(uint256 _swapFee) public {
@@ -100,10 +99,6 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
     function getLsrMinBalance() public view returns (uint256) {
         return lsrMinBalance;
     }
-
-    // function setPairAddress(address _pair) public {
-    //     pairAddress = _pair;
-    // }
 
     // **** ADD LIQUIDITY ****
     function _addLiquidity(
@@ -149,7 +144,7 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
                     "PancakeRouter: INSUFFICIENT_A_AMOUNT"
                 );
                 (amountA, amountB) = (amountAOptimal, amountBDesired);
-                emit AddLiquidity(amountA, amountB);
+                
             }
         }
     }
@@ -187,6 +182,7 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
         TransferHelper.safeTransferFrom(tokenA, msg.sender, pair, amountA);
         TransferHelper.safeTransferFrom(tokenB, msg.sender, pair, amountB);
         liquidity = IPancakePair(pair).mint(to);
+        emit AddLiquidity(amountA, amountB);
     }
 
     // **** REMOVE LIQUIDITY ****
@@ -214,6 +210,7 @@ contract PancakeRouter_mod is IPancakeRouter02, Ownable, AccessControl {
             : (amount1, amount0);
         require(amountA >= amountAMin, "PancakeRouter: INSUFFICIENT_A_AMOUNT");
         require(amountB >= amountBMin, "PancakeRouter: INSUFFICIENT_B_AMOUNT");
+        emit RemoveLiquidity(amount0,amount1);
     }
 
     function removeLiquidityWithPermit(

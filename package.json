@@ -1,11 +1,11 @@
 {
     "name": "hardhat-project",
     "devDependencies": {
-        "@nomicfoundation/hardhat-toolbox": "1.0.2",
-        "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@0.3.0-beta.13",
-        "@nomiclabs/hardhat-etherscan": "3.0.1",
+        "@nomicfoundation/hardhat-toolbox": "2.0.2",
+        "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
+        "@nomiclabs/hardhat-etherscan": "3.1.7",
         "@tenderly/hardhat-tenderly": "1.1.6",
-        "hardhat": "^2.12.7",
+        "hardhat": "2.12.7",
         "hardhat-deploy": "0.11.18",
         "tenderly": "0.0.1"
     },
@@ -15,6 +15,7 @@
         "hardhat-contract-sizer": "2.6.1",
         "hardhat-deploy-ethers": "0.3.0-beta.13",
         "hardhat-deploy-tenderly": "0.2.0",
+        "keccak256": "^1.0.6",
         "solidity-coverage": "^0.8.2"
     }
 }

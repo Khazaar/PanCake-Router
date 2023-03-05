@@ -2,45 +2,51 @@
 pragma solidity >=0.6.0;
 import "./ERC20.sol";
 import "hardhat/console.sol";
-import "../contracts/access/Ownable.sol";
+import "./access/AccessControlEnumerable.sol";
+import "./interfaces/IERC20Basic.sol";
 
-contract ERC20Basic is ERC20, Ownable {
+contract ERC20Basic is ERC20 ,AccessControlEnumerable,IERC20Basic {
     mapping(address => uint256) public lastMint;
     mapping(address => uint256) public mintedInPeriod;
     uint256 private _mintLimitAmount;
     uint256 private  _mintLimitPeriodSeconds;
+    bytes32 public constant OWNER_ROLE = keccak256(abi.encodePacked("OWNER"));
     constructor(string memory name_, string memory symbol_)
         public
         ERC20(name_, symbol_)
     {
-        setMintLimitAmount(1000000);
+        _setupRole(OWNER_ROLE, msg.sender);
+        setMintLimitAmount(100000);
         //60*60*0.01; // 1 hour 
-        setMintLimitPeriodSeconds(600);
+        setMintLimitPeriodSeconds(36000);
     }
+    
     event MintRevertedAmount(uint256 indexed askedAmount, uint256 indexed mintLimitAmount);
     event MintRevertedPeriod(uint256 indexed timePassedSeconds, uint256 indexed mintLimitPeriodSeconds);
     event MintLimitAmountSet(uint256 indexed mintLimitAmount);
     event MintLimitPeriodSecondsSet(uint256 indexed mintLimitPeriodSeconds);
 
-    function setMintLimitAmount(uint256 mintLimitAmount) public onlyOwner {
+     function setMintLimitAmount(uint256 mintLimitAmount) public override {
+        require(hasRole(OWNER_ROLE, msg.sender), "Adress is not owner");
         _mintLimitAmount = mintLimitAmount;
         emit MintLimitAmountSet(_mintLimitAmount);
     }
 
-    function getMintLimitAmount() public view returns(uint256) {
+    function getMintLimitAmount() public view override returns(uint256) {
         return( _mintLimitAmount);
     }
 
-    function setMintLimitPeriodSeconds(uint256 mintLimitPeriodSeconds) public onlyOwner {
+    function setMintLimitPeriodSeconds(uint256 mintLimitPeriodSeconds) public override{
+        require(hasRole(OWNER_ROLE, msg.sender), "Adress is not owner");
         _mintLimitPeriodSeconds = mintLimitPeriodSeconds;
         MintLimitPeriodSecondsSet(_mintLimitPeriodSeconds);
     }
 
-    function getMintLimitPeriodSeconds() public view returns(uint256) {
+    function getMintLimitPeriodSeconds() public view override returns(uint256) {
         return(_mintLimitPeriodSeconds);
     }
 
-    function getTokens(uint256 askedAmount) public {
+    function getTokens(uint256 askedAmount) public override {
         uint256 timePassedSeconds = block.timestamp - lastMint[msg.sender];
         require(askedAmount<=_mintLimitAmount,"Please do not exceed mint amount");
         if(timePassedSeconds <= _mintLimitPeriodSeconds){
@@ -54,7 +60,7 @@ contract ERC20Basic is ERC20, Ownable {
         } 
     
 
-    function burnAllTokens() public {
+    function burnAllTokens() public override{
         uint256 balance = balanceOf(msg.sender);
         console.log("Burning");
         console.log(balance);
@@ -63,7 +69,7 @@ contract ERC20Basic is ERC20, Ownable {
         _burn(msg.sender, balance);
     }
 
-    function decimals() public view virtual override returns (uint8) {
+    function decimals() public view virtual override(IERC20, ERC20) returns (uint8) {
         return 3;
     }
 }
