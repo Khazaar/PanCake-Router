@@ -97,6 +97,7 @@ describe("Admin features", () => {
             "VM Exception while processing transaction: reverted with reason string 'Prohibited for non admins'"
         );
     });
+
     it("Withdraw swap fee", async () => {
         const {
             owner,
@@ -164,7 +165,7 @@ describe("Admin features", () => {
             .connect(user1)
             .withdrawFees(
                 contractApple.address,
-                contractApple.balanceOf(user1.address)
+                contractApple.balanceOf(contractRouter_mod.address)
             );
         const feeWithdrawn = await contractApple.balanceOf(user1.address);
         expect(feeWithdrawn).to.equal(

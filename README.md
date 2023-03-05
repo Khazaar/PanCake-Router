@@ -1,34 +1,24 @@
-This project is a fork of Uniswap v2 DEX with modified router - a bundle of DEX smart contracts and ERC20 tokens (/contracts), and hardhat scripts to deploy(/deploy), verify them and interract wuth them (/scripts).
-Modifications comparing with source Uniswap (Pancakeswap) DEX smartcontracts are:
+## General information
 
--   Users with native DEX toren (LSR) don't pay trading fee;
--   PancakeRouter_mod smartcontract has an admin, who is able to set transfer fee, withdraw transfer fee set required LSR amount to avoid payinf trading fee;
+This Hardhat project is a fork of Uniswap v2 DEX with a modified router - a bundle of DEX smart contracts and ERC20 tokens (/contracts), and hardhat scripts to deploy(/deploy), verify them and interact with them (/scripts). Typescript bindings for DEX smart contracts are generated with typechain and stored in /typechain-types. Tests are stored in /test folders.
 
-There are 4 ERC20 smatrcontracts(ERC20Apple, ERC20Potato, ERC20Tomato and ERC20LSR), with can be minted for free with some limitations to test DEX features.
+To spin up the local blockchain node and deploy DEX smart contracts run:
+hh node
+hh run scripts/deploy.ts --network localhost
 
-Supported networks are: Goerli, BSC Testnet, Hardhat Local.
+To perform tests on the local blockchain node run:
+hh test
 
-## Project instructions
+## Advanced router features
 
-0. Run node and deploy
-   hh node
-1. Fund users
-   hh run scripts/fund-users.ts --network localhost
-2. Check DEX status
-   hh run scripts/dex-status.ts --network localhost
-3. Create pairs (non nececery)
-   hh run scripts/create-pairs.ts --network localhost
-4. Add Liquidity
-   hh run scripts/add-liquidityUNV.ts --network localhost
-5. Swap
-   hh run scripts/swapUNV.ts --network localhost
-6. Call oracle
-   hh run scripts/oracle.ts --network localhost
-7. Withdraw fees
-   hh run scripts/withdrawFees.ts --network localhost
-8. Manage admin
-   hh run scripts/manage-admin.ts --network localhost
-9. Manage mint conditions
-   hh run scripts/manage-mint-conditions.ts --network localhost
+Modifications comparing with source Uniswap (Pancakeswap) DEX smart contracts are:
 
-Web inetface for this DEX (another my Angular Web3 frondend project) could be found here: https://master.dbnd0fh0jij.amplifyapp.com/
+-   Users with native DEX token (LSR) don't pay a trading fee;
+-   PancakeRouter_mod smart contract can have an Admin, who can set the transfer fee, withdraw the transfer fee set the required LSR amount to avoid paying a trading fee;
+-   Admin role could be assigned or revoked by the Owner;
+
+There are 4 ERC20 smart contracts (ERC20Apple, ERC20Potato, ERC20Tomato, and ERC20LSR), which can be minted to test DEX features for free with some limitations - munt amount and mint period, which can be set by router Owner.
+
+Supported networks are Sepolia, BSC Testnet, Hardhat Local.
+
+Web interface for this DEX (another of my React Web3 frond-end project) could be found here: https://master.d2vryayadfjwli.amplifyapp.com/
